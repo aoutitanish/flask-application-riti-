@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit a Number</title>
+    <script>
+        async function submitNumber(event) {
+            event.preventDefault();
+
+            const input = document.getElementById("number-input");
+            const number = input.value;
+
+            if (!number) return;
+
+            try {
+                await fetch("/data", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ number: parseInt(number) })
+                });
+
+                input.value = "";
+                loadNumbers();
+            } catch (err) {
+                alert("Error submitting number.");
+            }
+        }
+
+        async function loadNumbers() {
+            const response = await fetch("/data");
+            const data = await response.json();
+
+            const list = document.getElementById("number-list");
+            list.innerHTML = "";
+
+            data.forEach((num, index) => {
+                const li = document.createElement("li");
+                li.textContent = num;
+                list.appendChild(li);
+            });
+        }
+
+        window.onload = loadNumbers;
+    </script>
+</head>
+<body>
+    <h1>Enter a Number</h1>
+    <form onsubmit="submitNumber(event)">
+        <input type="number" id="number-input" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Submitted Numbers:</h2>
+    <ul id="number-list"></ul>
+</body>
+</html>
